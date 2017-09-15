@@ -21,10 +21,81 @@ namespace ContosoUniversity.Controllers
         }
 
         // GET: Students
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+            string sortOrder,
+            string currentFilter,
+            string searchString,
+            int? page)
         {
-            return View(await _context.Students.ToListAsync());
+            // The Sorting Hat
+            ViewData["CurrentSort"] = sortOrder;
+            
+            // Add sorting
+            ViewData["NameSortParam"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["FNameSortParam"] = sortOrder == "fname" ? "fname_desc" : "fname";
+            ViewData["DateSortParam"] = sortOrder == "Date" ? "date_desc" : "Date";
+
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            // Add search
+            ViewData["CurrentFilter"] = searchString;
+
+            var students = from s in _context.Students select s;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                students = students.Where(s => s.LastName.Contains(searchString) || s.FirstName.Contains(searchString));
+            }
+            
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    students = students.OrderByDescending(s => s.LastName);
+                    break;
+
+                case "fname_desc":
+                    students = students.OrderByDescending(s => s.FirstName);
+                    break;
+
+                case "fname":
+                    students = students.OrderBy(s => s.FirstName);
+                    break;
+
+                case "Date":
+                    students = students.OrderBy(s => s.EnrollmentDate);
+                    break;
+
+                case "date_desc":
+                    students = students.OrderByDescending(s => s.EnrollmentDate);
+                    break;
+
+                default:
+                    students = students.OrderBy(s => s.LastName);
+                    break;
+            }
+
+            // Add Search and pagination
+            int pageSize = 3;
+            return View(await PaginatedList<Student>.CreateAsync(students.AsNoTracking(), page ?? 1, pageSize));
+            
+            //Before pagination implimentation
+            //return View(await students.AsNoTracking().ToListAsync());
+
+            // V1, just returning the list of students
+            //return View(await _context.Students.ToListAsync());
         }
+
+
+
+
+
 
         // GET: Students/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -73,7 +144,7 @@ namespace ContosoUniversity.Controllers
                     return RedirectToAction(nameof(Index));
                 }
             }
-            catch (DbUpdateException ex)
+            catch (DbUpdateException /*ex*/)
             {
                 //Log the error
                 ModelState.AddModelError("", "Can not able to save changes. Please try again and again and again.");
@@ -123,7 +194,7 @@ namespace ContosoUniversity.Controllers
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateException ex)
+                catch (DbUpdateException /*ex*/)
                 {
                     ModelState.AddModelError("", "Can not able to save changes. Try again many, many do-overs.");
                 }
