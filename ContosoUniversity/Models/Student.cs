@@ -29,3 +29,6 @@ namespace ContosoUniversity.Models
         public ICollection<Enrollment> Enrollments { get; set; }
     }
 }
+
+
+//https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/migrations
