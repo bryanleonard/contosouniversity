@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace ContosoUniversity.Models
@@ -10,14 +13,27 @@ namespace ContosoUniversity.Models
     {
         public int ID { get; set; }
 
+        [Required]
         [DisplayName("Last name")]
+        [StringLength(50)] // instead of Required, could do [StringLength(50, MinimumLength=1)]
         public string LastName { get; set; }
 
+        [Required]
+        [StringLength(50, ErrorMessage = "First name can not be longer than 50 characters.")]
         [DisplayName("First Name")]
-        public string FirstName { get; set; }
+        [Column("FirstName")]
+        public string FirstMidName { get; set; }
 
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyy-MM-dd}", ApplyFormatInEditMode = true)]
         [DisplayName("Enrollment Date")]
         public DateTime EnrollmentDate { get; set; }
+
+        [Display(Name = "Full Name")]
+        public string FullName
+        {
+            get { return $"{LastName}, {FirstMidName}"; }
+        }
 
         //The Enrollments property is a navigation property. Navigation properties hold other entities that are related to this 
         //entity. In this case, the Enrollments property of a Student entity will hold all of the Enrollment entities that are 

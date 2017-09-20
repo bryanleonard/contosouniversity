@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+//https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/complex-data-model
+
 namespace ContosoUniversity
 {
     public class Startup

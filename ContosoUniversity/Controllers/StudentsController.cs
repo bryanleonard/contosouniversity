@@ -51,7 +51,7 @@ namespace ContosoUniversity.Controllers
 
             if (!String.IsNullOrEmpty(searchString))
             {
-                students = students.Where(s => s.LastName.Contains(searchString) || s.FirstName.Contains(searchString));
+                students = students.Where(s => s.LastName.Contains(searchString) || s.FirstMidName.Contains(searchString));
             }
             
             switch (sortOrder)
@@ -61,11 +61,11 @@ namespace ContosoUniversity.Controllers
                     break;
 
                 case "fname_desc":
-                    students = students.OrderByDescending(s => s.FirstName);
+                    students = students.OrderByDescending(s => s.FirstMidName);
                     break;
 
                 case "fname":
-                    students = students.OrderBy(s => s.FirstName);
+                    students = students.OrderBy(s => s.FirstMidName);
                     break;
 
                 case "Date":
@@ -82,7 +82,7 @@ namespace ContosoUniversity.Controllers
             }
 
             // Add Search and pagination
-            int pageSize = 3;
+            int pageSize = 4;
             return View(await PaginatedList<Student>.CreateAsync(students.AsNoTracking(), page ?? 1, pageSize));
             
             //Before pagination implimentation
@@ -133,7 +133,7 @@ namespace ContosoUniversity.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("LastName,FirstName,EnrollmentDate")] Student student)
+        public async Task<IActionResult> Create([Bind("LastName,FirstMidName,EnrollmentDate")] Student student)
         {
             try
             {
@@ -187,7 +187,7 @@ namespace ContosoUniversity.Controllers
             if (await TryUpdateModelAsync<Student>(
                 studentToUpdate, 
                 "", 
-                s => s.FirstName, s=> s.LastName, s => s.EnrollmentDate))
+                s => s.FirstMidName, s=> s.LastName, s => s.EnrollmentDate))
             {
                 try
                 {
